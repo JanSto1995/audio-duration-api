@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
-import librosa
+import soundfile as sf
 import os
-import traceback
 
 app = Flask(__name__)
 
@@ -20,15 +19,14 @@ def get_duration():
     file.save(filepath)
 
     try:
-        # Load audio file using librosa
-        y, sr = librosa.load(filepath, sr=44100)
-        duration = librosa.get_duration(y=y, sr=sr)
+        # Use soundfile to load only metadata
+        f = sf.SoundFile(filepath)
+        duration = len(f) / f.samplerate
 
         return jsonify({
             'filename': filename,
             'duration_seconds': round(duration, 2)
         })
+
     except Exception as e:
-        # Log error in Render logs
-        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
