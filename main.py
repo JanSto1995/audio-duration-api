@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import librosa
 import os
+import traceback
 
 app = Flask(__name__)
 
@@ -10,7 +11,6 @@ def home():
 
 @app.route('/duration', methods=['POST'])
 def get_duration():
-    # Check if file is part of request
     if 'file' not in request.files:
         return jsonify({'error': 'No file uploaded'}), 400
 
@@ -28,6 +28,7 @@ def get_duration():
             'filename': filename,
             'duration_seconds': round(duration, 2)
         })
-
     except Exception as e:
+        # Log error in Render logs
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
