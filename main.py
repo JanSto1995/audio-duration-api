@@ -10,6 +10,7 @@ def home():
 
 @app.route('/duration', methods=['POST'])
 def get_duration():
+    # Check if file is part of request
     if 'file' not in request.files:
         return jsonify({'error': 'No file uploaded'}), 400
 
@@ -19,11 +20,14 @@ def get_duration():
     file.save(filepath)
 
     try:
-        y, sr = librosa.load(filepath)
+        # Load audio file using librosa
+        y, sr = librosa.load(filepath, sr=44100)
         duration = librosa.get_duration(y=y, sr=sr)
+
         return jsonify({
             'filename': filename,
             'duration_seconds': round(duration, 2)
         })
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
